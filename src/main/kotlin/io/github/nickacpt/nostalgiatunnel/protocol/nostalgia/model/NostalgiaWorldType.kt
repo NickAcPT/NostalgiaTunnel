@@ -1,6 +1,6 @@
 package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model
 
-enum class WorldType(val wireValue: String) {
+enum class NostalgiaWorldType(val wireValue: String) {
     DEFAULT("default"),
     FLAT("flat"),
     LARGE_BIOMES("largeBiomes"),
