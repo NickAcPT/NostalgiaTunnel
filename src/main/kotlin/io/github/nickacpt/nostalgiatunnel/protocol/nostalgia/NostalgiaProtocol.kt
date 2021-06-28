@@ -33,6 +33,7 @@ object NostalgiaProtocol {
         registerPacket { NostalgiaPlayerLookMovePacket() }
         registerPacket { NostalgiaGameEventPacket() }
         registerPacket { NostalgiaWindowItemsPacket() }
+        registerPacket { NostalgiaSetSlotPacket() }
     }
 
     fun readPacket(id: Int, inputStream: DataInputStream): NostalgiaPacket? {

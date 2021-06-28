@@ -2,11 +2,13 @@ package io.github.nickacpt.nostalgiatunnel.client.nostalgia
 
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaProtocol
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaClientProtocolPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaServerAuthDataPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaSharedKeyPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaClientCommandPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaKeepAlivePacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaKickPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaLoginPacket
 import java.io.BufferedOutputStream
 import java.io.DataInputStream
@@ -22,9 +24,9 @@ import kotlin.concurrent.thread
 
 abstract class NostalgiaClient(private val address: String, private val port: Int) {
     private val writingPool = ForkJoinPool(1)
-    var socketChannel: SocketChannel = SocketChannel.open(InetSocketAddress(address, port))
-    var inputStream = DataInputStream(socketChannel.socket().getInputStream())
-    var outputStream = DataOutputStream(socketChannel.socket().getOutputStream())
+    var socketChannel: SocketChannel? = null
+    var inputStream: DataInputStream? = null
+    var outputStream: DataOutputStream? = null
 
     var publicKey: PublicKey? = null
     var secretKey: SecretKey? = null
@@ -42,14 +44,29 @@ abstract class NostalgiaClient(private val address: String, private val port: In
     }
 
     fun openConnection() {
+        socketChannel = SocketChannel.open(InetSocketAddress(address, port))
+        inputStream = DataInputStream(socketChannel!!.socket().getInputStream())
+        outputStream = DataOutputStream(socketChannel!!.socket().getOutputStream())
         startReadingThread()
+    }
+
+    private var pingResult: NostalgiaKickPacket? = null
+    var isPing = false
+    fun pingServer(): NostalgiaKickPacket {
+        isPing = true
+        openConnection()
+        writePacket(NostalgiaPingPacket())
+        while (pingResult == null)
+            sleep(2)
+        disconnect()
+        return pingResult!!
     }
 
     fun writePacket(packet: NostalgiaPacket) {
         writingPool.execute {
-            packet.writePacket(outputStream)
+            packet.writePacket(outputStream!!)
             onPacketWrite(packet)
-            outputStream.flush()
+            outputStream!!.flush()
 
             if (packet is NostalgiaSharedKeyPacket) {
                 println("Packet is shared key. START ENCRYPTING")
@@ -62,11 +79,12 @@ abstract class NostalgiaClient(private val address: String, private val port: In
     var readingThread: Thread? = null
     private fun startReadingThread() {
         readingThread = thread {
-            while (socketChannel.isOpen) {
-                val packetId = inputStream.read()
+            while (socketChannel!!.isOpen) {
+                if (socketChannel?.socket()?.isClosed == true) break
+                val packetId = inputStream!!.read()
                 if (packetId == -1) sleep(2)
                 try {
-                    val packet = NostalgiaProtocol.readPacket(packetId, inputStream)
+                    val packet = NostalgiaProtocol.readPacket(packetId, inputStream!!)
                     packet?.also { internalHandleReadPacket(it) }
                     if (packet != null) onPacketRead(packet) else onUnknownPacketRead(packetId)
                 } catch (e: Exception) {
@@ -74,11 +92,16 @@ abstract class NostalgiaClient(private val address: String, private val port: In
                     onUnknownPacketRead(packetId)
                 }
             }
-            println("Reading thread died")
         }
     }
 
     private fun internalHandleReadPacket(packet: NostalgiaPacket) {
+        if (isPing) {
+            if (packet is NostalgiaKickPacket) {
+                pingResult = packet
+            }
+            return
+        }
         when (packet) {
             is NostalgiaServerAuthDataPacket -> {
                 handleAuthData(packet)
@@ -102,7 +125,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
 
     open fun onUnknownPacketRead(packetId: Int) {}
     fun disconnect() {
-        socketChannel.close()
+        socketChannel?.close()
     }
 
     private fun handleAuthData(packet: NostalgiaServerAuthDataPacket) {
@@ -115,7 +138,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
     }
 
     private fun encryptOutputStream() {
-        outputStream.flush()
+        outputStream?.flush()
         isOutputEncrypted = true
         outputStream = DataOutputStream(
             BufferedOutputStream(

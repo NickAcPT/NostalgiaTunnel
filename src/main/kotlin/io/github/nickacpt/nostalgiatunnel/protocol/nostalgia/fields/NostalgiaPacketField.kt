@@ -19,4 +19,9 @@ abstract class NostalgiaPacketField<T>(default: T? = null) {
     operator fun setValue(packet: NostalgiaPacket, property: KProperty<*>, value: Any) {
         this.value = value as? T ?: throw Exception("Value for [${property.name}] not defined")
     }
+
+    @JvmName("setValueNullable")
+    operator fun setValue(packet: NostalgiaPacket, property: KProperty<*>, value: Any?) {
+        this.value = value as? T
+    }
 }
