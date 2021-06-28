@@ -4,6 +4,7 @@ import io.github.nickacpt.nostalgiatunnel.client.nostalgia.NostalgiaClient
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaChatPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaKickPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaWindowItemsPacket
 
 fun main() {
 
@@ -14,6 +15,8 @@ fun main() {
                 println("Got kicked with message ${packet.message}")
             } else if (packet is NostalgiaChatPacket) {
                 println("Received chat message [${packet.message}]")
+            } else if (packet is NostalgiaWindowItemsPacket) {
+                println("Received inventory")
             }
         }
 
