@@ -89,9 +89,11 @@ abstract class NostalgiaClient(private val address: String, private val port: In
                     if (packet != null) onPacketRead(packet) else onUnknownPacketRead(packetId)
                 } catch (e: Exception) {
                     println("An error occurred reading packet $packetId")
+                    e.printStackTrace()
                     onUnknownPacketRead(packetId)
                 }
             }
+            onDisconnect()
         }
     }
 
@@ -124,6 +126,9 @@ abstract class NostalgiaClient(private val address: String, private val port: In
     open fun onPacketWrite(packet: NostalgiaPacket) {}
 
     open fun onUnknownPacketRead(packetId: Int) {}
+
+    open fun onDisconnect() {}
+
     fun disconnect() {
         socketChannel?.close()
     }

@@ -43,7 +43,7 @@ class NostalgiaPacketFieldBuilder(var onResult: (NostalgiaPacketField<*>) -> Uni
         return result(DoubleNostalgiaPacketField(default))
     }
 
-    fun itemStack(default: NostalgiaItemStack? = null): NostalgiaPacketField<NostalgiaItemStack?> {
+    fun itemStack(default: NostalgiaItemStack? = null): NullableNostalgiaPacketField<NostalgiaItemStack> {
         return result(NostalgiaItemStackPacketField(default))
     }
 
@@ -85,6 +85,11 @@ class NostalgiaPacketFieldBuilder(var onResult: (NostalgiaPacketField<*>) -> Uni
     var isResultDisabled = false
 
     private inline fun <reified T> result(packetField: NostalgiaPacketField<T>): NostalgiaPacketField<T> {
+        if (!isResultDisabled) onResult.invoke(packetField)
+        return packetField
+    }
+
+    private inline fun <reified T> result(packetField: NullableNostalgiaPacketField<T>): NullableNostalgiaPacketField<T> {
         if (!isResultDisabled) onResult.invoke(packetField)
         return packetField
     }
