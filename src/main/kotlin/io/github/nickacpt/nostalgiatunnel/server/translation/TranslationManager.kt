@@ -36,5 +36,6 @@ object TranslationManager {
         registerTranslation { KickPacketTranslation() }
         registerTranslation { SetSlotPacketTranslation() }
         registerMultiTranslation { MapChunksPacketTranslation() }
+        registerTranslation { PlayerInventoryPacketTranslation() }
     }
 }

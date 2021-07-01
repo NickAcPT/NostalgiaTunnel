@@ -2,6 +2,7 @@ package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.fields
 
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.fields.impl.*
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.NostalgiaItemStack
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.metadata.WatchableObject
 import java.io.DataInputStream
 import java.io.DataOutputStream
 
@@ -49,6 +50,10 @@ class NostalgiaPacketFieldBuilder(var onResult: (NostalgiaPacketField<*>) -> Uni
 
     fun itemStackArray(default: Array<NostalgiaItemStack?>? = null): NostalgiaPacketField<Array<NostalgiaItemStack?>> {
         return result(NostalgiaItemStackArrayPacketField(default))
+    }
+
+    fun watchableObjectList(default: List<WatchableObject>? = null): NostalgiaPacketField<List<WatchableObject>> {
+        return result(WatchableObjectNostalgiaPacketField(default))
     }
 
     inline fun <reified T> custom(
