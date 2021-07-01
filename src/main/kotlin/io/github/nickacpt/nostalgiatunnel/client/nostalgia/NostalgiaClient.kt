@@ -1,5 +1,6 @@
 package io.github.nickacpt.nostalgiatunnel.client.nostalgia
 
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaProtocol
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.NostalgiaPingPacket
@@ -97,7 +98,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
         }
     }
 
-    private fun internalHandleReadPacket(packet: NostalgiaPacket) {
+    private fun internalHandleReadPacket(packet: BaseNostalgiaPacket) {
         if (isPing) {
             if (packet is NostalgiaKickPacket) {
                 pingResult = packet
@@ -121,9 +122,9 @@ abstract class NostalgiaClient(private val address: String, private val port: In
         }
     }
 
-    open fun onPacketRead(packet: NostalgiaPacket) {}
+    open fun onPacketRead(packet: BaseNostalgiaPacket) {}
 
-    open fun onPacketWrite(packet: NostalgiaPacket) {}
+    open fun onPacketWrite(packet: BaseNostalgiaPacket) {}
 
     open fun onUnknownPacketRead(packetId: Int) {}
 

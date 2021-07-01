@@ -1,7 +1,7 @@
 package io.github.nickacpt.nostalgiatunnel.protocol
 
 import io.github.nickacpt.nostalgiatunnel.client.nostalgia.NostalgiaClient
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaChatPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaKickPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaWindowItemsPacket
@@ -9,7 +9,7 @@ import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.Nostalgia
 fun main() {
 
     val client = object : NostalgiaClient("localhost", 25565) {
-        override fun onPacketRead(packet: NostalgiaPacket) {
+        override fun onPacketRead(packet: BaseNostalgiaPacket) {
             println("Read packet [${packet.javaClass.simpleName}] $isInputDecrypted")
             if (packet is NostalgiaKickPacket) {
                 println("Got kicked with message ${packet.message}")
@@ -20,7 +20,7 @@ fun main() {
             }
         }
 
-        override fun onPacketWrite(packet: NostalgiaPacket) {
+        override fun onPacketWrite(packet: BaseNostalgiaPacket) {
             println("Wrote packet [${packet.javaClass.simpleName}] $isOutputEncrypted")
         }
 

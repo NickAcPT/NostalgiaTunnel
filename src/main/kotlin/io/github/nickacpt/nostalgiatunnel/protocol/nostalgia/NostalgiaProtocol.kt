@@ -9,9 +9,9 @@ import java.io.DataInputStream
 
 object NostalgiaProtocol {
     const val protocolVersion = 61
-    private val packetMap = mutableMapOf<Int, () -> NostalgiaPacket>()
+    private val packetMap = mutableMapOf<Int, () -> BaseNostalgiaPacket>()
 
-    private fun registerPacket(creator: () -> NostalgiaPacket) {
+    private fun registerPacket(creator: () -> BaseNostalgiaPacket) {
         val tempPacket = creator()
         packetMap[tempPacket.packetId] = creator
     }
@@ -34,9 +34,10 @@ object NostalgiaProtocol {
         registerPacket { NostalgiaGameEventPacket() }
         registerPacket { NostalgiaWindowItemsPacket() }
         registerPacket { NostalgiaSetSlotPacket() }
+        registerPacket { NostalgiaMapChunksPacket() }
     }
 
-    fun readPacket(id: Int, inputStream: DataInputStream): NostalgiaPacket? {
+    fun readPacket(id: Int, inputStream: DataInputStream): BaseNostalgiaPacket? {
         return packetMap[id]?.invoke()?.also { it.readPacket(inputStream) }
     }
 
