@@ -6,7 +6,7 @@ import com.github.steveice10.mc.protocol.data.status.PlayerInfo
 import com.github.steveice10.mc.protocol.data.status.ServerStatusInfo
 import com.github.steveice10.mc.protocol.data.status.VersionInfo
 import com.github.steveice10.packetlib.Session
-import io.github.nickacpt.nostalgiatunnel.client.nostalgia.NostalgiaClient
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client.NostalgiaClient
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 

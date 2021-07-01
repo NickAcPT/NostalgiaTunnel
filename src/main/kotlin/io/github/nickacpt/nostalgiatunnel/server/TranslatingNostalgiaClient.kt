@@ -1,7 +1,7 @@
 package io.github.nickacpt.nostalgiatunnel.server
 
 import com.github.steveice10.packetlib.Session
-import io.github.nickacpt.nostalgiatunnel.client.nostalgia.NostalgiaClient
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client.NostalgiaClient
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.server.translation.TranslationManager
 

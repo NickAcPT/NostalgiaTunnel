@@ -1,8 +1,10 @@
 package io.github.nickacpt.nostalgiatunnel.server.translation.impl
 
+import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket
 import com.github.steveice10.opennbt.tag.builtin.*
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaLoginPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.NostalgiaGameType
 import io.github.nickacpt.nostalgiatunnel.server.translation.InputPacketTranslation
 
 class LoginPacketTranslation : InputPacketTranslation<NostalgiaLoginPacket, ServerJoinGamePacket> {
@@ -83,8 +85,8 @@ class LoginPacketTranslation : InputPacketTranslation<NostalgiaLoginPacket, Serv
         return ServerJoinGamePacket(
             input.clientEntityId,
             false,
-            input.gameType.modernGameMode,
-            input.gameType.modernGameMode,
+            getModernGameMode(input),
+            getModernGameMode(input),
             1, arrayOf("minecraft:world"),
             getDimensionTag(),
             getOverworldTag(),
@@ -98,6 +100,14 @@ class LoginPacketTranslation : InputPacketTranslation<NostalgiaLoginPacket, Serv
             false
         )
 
+    }
+
+    private fun getModernGameMode(input: NostalgiaLoginPacket): GameMode {
+        return when (input.gameType) {
+            NostalgiaGameType.NOT_SET, NostalgiaGameType.SURVIVAL -> GameMode.SURVIVAL
+            NostalgiaGameType.CREATIVE -> GameMode.CREATIVE
+            NostalgiaGameType.ADVENTURE -> GameMode.ADVENTURE
+        }
     }
 
 }

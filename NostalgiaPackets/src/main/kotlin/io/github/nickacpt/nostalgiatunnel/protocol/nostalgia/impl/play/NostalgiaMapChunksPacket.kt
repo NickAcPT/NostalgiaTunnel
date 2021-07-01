@@ -1,6 +1,7 @@
 package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play
 
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.chunk.NostalgiaChunk
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -20,6 +21,13 @@ class NostalgiaMapChunksPacket : BaseNostalgiaPacket(0x38) {
     var dataLength = 0
     var hasSkyLight = false
     var compressedData = ByteArray(0)
+
+    val chunks: List<NostalgiaChunk>
+        get() {
+            return chunkPosX.indices.map { i ->
+                NostalgiaChunk().apply { fillChunk(decompressedData[i], primary[i], add[i], true, hasSkyLight) }
+            }
+        }
 
     override fun readPacketContent(input: DataInputStream) {
         val chunksCount: Int = input.readShort().toInt()

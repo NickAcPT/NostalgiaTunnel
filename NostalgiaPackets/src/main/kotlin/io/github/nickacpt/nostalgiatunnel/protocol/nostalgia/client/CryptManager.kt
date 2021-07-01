@@ -1,4 +1,4 @@
-package io.github.nickacpt.nostalgiatunnel.client.nostalgia
+package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client
 
 import org.bouncycastle.crypto.BufferedBlockCipher
 import org.bouncycastle.crypto.CipherKeyGenerator
