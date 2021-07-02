@@ -28,15 +28,13 @@ object CryptManager {
         return SecretKeySpec(generator.generateKey(), "AES")
     }
 
-    fun generateKeyPair(): KeyPair? {
+    fun generateKeyPair(): KeyPair {
         return try {
             val generator = KeyPairGenerator.getInstance("RSA")
             generator.initialize(1024)
             generator.generateKeyPair()
         } catch (ex: NoSuchAlgorithmException) {
-            ex.printStackTrace()
-            System.err.println("Key pair generation failed!")
-            null
+            throw Exception("Uh, fix your server. There's no RSA keypair generator")
         }
     }
 

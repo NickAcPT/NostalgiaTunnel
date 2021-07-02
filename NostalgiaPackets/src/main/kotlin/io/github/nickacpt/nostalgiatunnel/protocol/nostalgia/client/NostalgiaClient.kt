@@ -3,8 +3,8 @@ package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaProtocol
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaClientProtocolPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaServerAuthDataPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaSharedKeyPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaClientCommandPacket
@@ -36,7 +36,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
 
     fun connect(userName: String) {
         openConnection()
-        writePacket(NostalgiaClientProtocolPacket().apply {
+        sendPacket(NostalgiaClientProtocolPacket().apply {
             protocolVersion = NostalgiaProtocol.protocolVersion
             this.userName = userName
             serverHost = address
@@ -56,23 +56,21 @@ abstract class NostalgiaClient(private val address: String, private val port: In
     fun pingServer(): NostalgiaKickPacket {
         isPing = true
         openConnection()
-        writePacket(NostalgiaPingPacket())
+        sendPacket(NostalgiaPingPacket())
         while (pingResult == null)
             sleep(2)
         disconnect()
         return pingResult!!
     }
 
-    fun writePacket(packet: NostalgiaPacket) {
+    fun sendPacket(packet: NostalgiaPacket) {
         writingPool.execute {
             packet.writePacket(outputStream!!)
             onPacketWrite(packet)
             outputStream!!.flush()
 
             if (packet is NostalgiaSharedKeyPacket) {
-                println("Packet is shared key. START ENCRYPTING")
                 encryptOutputStream()
-                println("Packet is shared key. END ENCRYPTING")
             }
         }
     }
@@ -111,10 +109,10 @@ abstract class NostalgiaClient(private val address: String, private val port: In
             }
             is NostalgiaSharedKeyPacket -> {
                 decryptInputStream()
-                writePacket(NostalgiaClientCommandPacket())
+                sendPacket(NostalgiaClientCommandPacket())
             }
             is NostalgiaKeepAlivePacket -> {
-                writePacket(packet)
+                sendPacket(packet)
             }
             is NostalgiaLoginPacket -> {
                 println("User has logged in.")
@@ -137,7 +135,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
     private fun handleAuthData(packet: NostalgiaServerAuthDataPacket) {
         publicKey = CryptManager.decodePublicKey(packet.publicKey)
         secretKey = CryptManager.createNewSharedKey()
-        writePacket(NostalgiaSharedKeyPacket().apply {
+        sendPacket(NostalgiaSharedKeyPacket().apply {
             this.sharedSecret = CryptManager.encryptData(publicKey!!, secretKey!!.encoded)
             this.verifyToken = CryptManager.encryptData(publicKey!!, packet.verifyToken)
         })
@@ -154,7 +152,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
                 ), 5120
             )
         )
-        println("Output is now encrypted")
+        println("Client Output is now encrypted")
     }
 
     private fun decryptInputStream() {
@@ -165,6 +163,6 @@ abstract class NostalgiaClient(private val address: String, private val port: In
                 inputStream
             )
         )
-        println("Input is now decrypted")
+        println("Server Input is now decrypted")
     }
 }
