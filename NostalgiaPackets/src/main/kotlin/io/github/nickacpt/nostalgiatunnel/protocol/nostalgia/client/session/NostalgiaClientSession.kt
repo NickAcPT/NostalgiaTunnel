@@ -22,6 +22,27 @@ data class NostalgiaClientSession(
     var isInputDecrypted = false
     var isOutputEncrypted = false
 
+    //region Extra data
+    private val extraData = mutableMapOf<String, Any?>()
+    operator fun <T> contains(dataTag: NostalgiaClientSessionKey<T>): Boolean {
+        return get(dataTag) != null
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T> get(dataTag: NostalgiaClientSessionKey<T>): T? {
+        val result = extraData[dataTag.tagName]
+        return result as? T?
+    }
+
+
+    operator fun <T> set(dataTag: NostalgiaClientSessionKey<T>, value: T?) {
+        if (value == null) {
+            extraData.remove(dataTag.tagName)
+            return
+        }
+        extraData[dataTag.tagName] = value
+    }
+    //endregion
 
     internal fun encryptOutputStream() {
         outputStream.flush()
@@ -51,9 +72,13 @@ data class NostalgiaClientSession(
     private val writingPool = ForkJoinPool(1)
     fun sendPacket(packet: BaseNostalgiaPacket, blocking: Boolean = false) {
         val toRun = {
-            packet.writePacket(outputStream)
-            onPacketWrite(packet)
-            outputStream.flush()
+            try {
+                packet.writePacket(outputStream)
+                onPacketWrite(packet)
+                outputStream.flush()
+            } catch (e: Exception) {
+                println("Error writing packet [${packet.javaClass.simpleName}] to client")
+            }
         }
 
         if (!blocking) writingPool.execute(toRun) else run(toRun)

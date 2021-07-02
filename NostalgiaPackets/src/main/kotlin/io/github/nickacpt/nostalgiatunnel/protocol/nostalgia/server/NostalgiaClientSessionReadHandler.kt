@@ -22,7 +22,10 @@ class NostalgiaClientSessionReadHandler(
         while (session.isConnected) {
             if (session.clientSocket.isClosed) break
             val packetId = session.inputStream.read()
-            if (packetId == -1) Thread.sleep(2)
+            if (packetId == -1) {
+                Thread.sleep(2)
+                continue
+            }
 
             try {
                 val packet = NostalgiaProtocol.readPacket(packetId, session.inputStream)
@@ -44,13 +47,15 @@ class NostalgiaClientSessionReadHandler(
             // Ping
             is NostalgiaPingPacket -> {
                 val result = server.onServerPing(session)
-                session.sendPacket(NostalgiaKickPacket(
-                    NostalgiaProtocol.protocolVersion,
-                    "1.5.2",
-                    LegacyComponentSerializer.legacySection().serialize(result.motd),
-                    result.currentPlayerCount,
-                    result.maxPlayerCount
-                ), blocking = true)
+                session.sendPacket(
+                    NostalgiaKickPacket(
+                        NostalgiaProtocol.protocolVersion,
+                        "1.5.2",
+                        LegacyComponentSerializer.legacySection().serialize(result.motd),
+                        result.currentPlayerCount,
+                        result.maxPlayerCount
+                    ), blocking = true
+                )
                 session.disconnect()
             }
             // Client is trying to join
@@ -67,7 +72,8 @@ class NostalgiaClientSessionReadHandler(
                 // Finish Encryption
                 session.sharedKey = packet.getSharedKey(server.keyPair.private)
 
-                val isSameVerifyToken = CryptManager.decryptData(server.keyPair.private, packet.verifyToken).contentEquals(session.verifyToken)
+                val isSameVerifyToken = CryptManager.decryptData(server.keyPair.private, packet.verifyToken)
+                    .contentEquals(session.verifyToken)
                 println("Got verify token from client. Is same: $isSameVerifyToken")
 
                 session.sendPacket(NostalgiaSharedKeyPacket(), true)

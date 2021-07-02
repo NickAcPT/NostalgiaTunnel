@@ -45,6 +45,8 @@ object NostalgiaProtocol {
         registerPacket { NostalgiaEntityHeadRotationPacket() }
         registerPacket { NostalgiaPlayerInventoryPacket() }
         registerPacket { NostalgiaClientCommandPacket() }
+        registerPacket { NostalgiaCustomPayloadPacket() }
+        registerPacket { NostalgiaClientInfoPacket() }
     }
 
     fun readPacket(id: Int, inputStream: DataInputStream): BaseNostalgiaPacket? {

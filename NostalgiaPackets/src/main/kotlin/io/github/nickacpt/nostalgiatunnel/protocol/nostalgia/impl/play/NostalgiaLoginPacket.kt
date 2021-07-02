@@ -5,22 +5,34 @@ import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.NostalgiaGame
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.NostalgiaWorldType
 
 class NostalgiaLoginPacket : NostalgiaPacket(0x1) {
-    var clientEntityId by value().int()
-    var rawTerrainType by value().string(16)
-    var rawGameType by value().byte()
-    var dimension by value().byte()
-    var difficultySetting by value().byte()
-    var worldHeight by value().byte()
-    var maxPlayers by value().byte()
+    var clientEntityId by value().int(-1)
+    var rawTerrainType by value().string(16, "default")
+    var rawGameType by value().byte(0)
+    var dimension by value().byte(0)
+    var difficultySetting by value().byte(0)
+    var worldHeight by value().byte(Byte.MAX_VALUE * 2)
+    var maxPlayers by value().byte(0)
 
-    val isHardcoreMode
+    var isHardcoreMode
         get() = (rawGameType and 0x8) == 0x8
+        set(value) {
+            rawGameType = computeGameType(gameType, value)
+        }
 
-    val gameType
-        get() = NostalgiaGameType.values().firstOrNull { it.id == (rawGameType and 0xFFFFFFF7.toInt()) } ?: NostalgiaGameType.NOT_SET
+    var gameType
+        get() = NostalgiaGameType.values().firstOrNull { it.id == (rawGameType and 0xFFFFFFF7.toInt()) }
+            ?: NostalgiaGameType.NOT_SET
+        set(value) {
+            rawGameType = computeGameType(value, isHardcoreMode)
+        }
+
+    private fun computeGameType(gameType: NostalgiaGameType, isHardcoreMode: Boolean): Int {
+        return gameType.id.let { if (isHardcoreMode) it or 8 else it }
+    }
 
     var worldType
-        get() = NostalgiaWorldType.values().firstOrNull { it.wireValue.equals(rawTerrainType, true) } ?: NostalgiaWorldType.DEFAULT
+        get() = NostalgiaWorldType.values().firstOrNull { it.wireValue.equals(rawTerrainType, true) }
+            ?: NostalgiaWorldType.DEFAULT
         set(value) {
             rawTerrainType = value.wireValue
         }
