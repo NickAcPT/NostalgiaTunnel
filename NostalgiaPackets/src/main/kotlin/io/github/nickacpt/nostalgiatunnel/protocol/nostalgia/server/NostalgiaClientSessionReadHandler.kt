@@ -8,8 +8,8 @@ import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.Nostalgi
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaServerAuthDataPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaSharedKeyPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaClientCommandPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaKickPacket
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaLoginPacket
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import kotlin.random.Random
 
@@ -21,12 +21,11 @@ class NostalgiaClientSessionReadHandler(
     fun run() {
         while (session.isConnected) {
             if (session.clientSocket.isClosed) break
-            val inputStream = session.inputStream
-            val packetId = inputStream.read()
+            val packetId = session.inputStream.read()
             if (packetId == -1) Thread.sleep(2)
 
             try {
-                val packet = NostalgiaProtocol.readPacket(packetId, inputStream)
+                val packet = NostalgiaProtocol.readPacket(packetId, session.inputStream)
                 packet?.also { internalHandleReadPacket(it) }
                 if (packet != null) onPacketRead(packet) else onUnknownPacketRead(packetId)
             } catch (e: Exception) {
@@ -67,23 +66,28 @@ class NostalgiaClientSessionReadHandler(
             is NostalgiaSharedKeyPacket -> {
                 // Finish Encryption
                 session.sharedKey = packet.getSharedKey(server.keyPair.private)
-                session.decryptInputStream()
 
                 val isSameVerifyToken = CryptManager.decryptData(server.keyPair.private, packet.verifyToken).contentEquals(session.verifyToken)
                 println("Got verify token from client. Is same: $isSameVerifyToken")
 
                 session.sendPacket(NostalgiaSharedKeyPacket(), true)
+
+                session.decryptInputStream()
+                session.encryptOutputStream()
             }
-            is NostalgiaLoginPacket -> {
-                println("Got login packet from client. SUS")
+            is NostalgiaClientCommandPacket -> {
+                if (packet.isRespawn) return
+                server.onPlayerFinishLogin(session)
             }
         }
     }
 
     private fun onPacketRead(packet: BaseNostalgiaPacket) {
+        server.onPacketReceived(session, packet)
     }
 
     private fun onUnknownPacketRead(packetId: Int) {
-
+        println("Read unknown packet [${packetId}] from client")
+        server.onServerUnknownPacketReceived(session, packetId)
     }
 }

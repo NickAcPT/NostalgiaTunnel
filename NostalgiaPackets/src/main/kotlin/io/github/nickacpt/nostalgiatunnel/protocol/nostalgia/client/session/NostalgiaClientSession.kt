@@ -2,7 +2,6 @@ package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client.session
 
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client.CryptManager
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaSharedKeyPacket
 import java.io.BufferedOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -55,10 +54,6 @@ data class NostalgiaClientSession(
             packet.writePacket(outputStream)
             onPacketWrite(packet)
             outputStream.flush()
-
-            if (packet is NostalgiaSharedKeyPacket) {
-                encryptOutputStream()
-            }
         }
 
         if (!blocking) writingPool.execute(toRun) else run(toRun)

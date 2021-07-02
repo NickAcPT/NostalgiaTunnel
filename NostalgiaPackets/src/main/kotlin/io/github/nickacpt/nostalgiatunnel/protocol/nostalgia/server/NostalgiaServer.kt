@@ -1,5 +1,6 @@
 package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.server
 
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client.CryptManager
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client.session.NostalgiaClientSession
 import java.net.InetSocketAddress
@@ -34,11 +35,17 @@ abstract class NostalgiaServer(private val address: String, private val port: In
         }
     }
 
+    abstract fun onServerPing(session: NostalgiaClientSession): ServerListPingResult
+
+    abstract fun onPlayerFinishLogin(session: NostalgiaClientSession)
+
+    abstract fun onPacketReceived(session: NostalgiaClientSession, packet: BaseNostalgiaPacket)
+
     private fun handleNewSession(session: NostalgiaClientSession) {
         thread { NostalgiaClientSessionReadHandler(session, this).run() }
     }
 
-    abstract fun onServerPing(session: NostalgiaClientSession): ServerListPingResult
+    abstract fun onServerUnknownPacketReceived(session: NostalgiaClientSession, packetId: Int)
 
     fun removeSession(session: NostalgiaClientSession) {
         clientList.remove(session)

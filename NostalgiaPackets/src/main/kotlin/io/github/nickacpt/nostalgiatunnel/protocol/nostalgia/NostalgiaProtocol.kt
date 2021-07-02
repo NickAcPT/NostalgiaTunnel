@@ -1,7 +1,7 @@
 package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia
 
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaClientProtocolPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaServerAuthDataPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaSharedKeyPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.*
@@ -44,6 +44,7 @@ object NostalgiaProtocol {
         registerPacket { NostalgiaEntityMetadataPacket() }
         registerPacket { NostalgiaEntityHeadRotationPacket() }
         registerPacket { NostalgiaPlayerInventoryPacket() }
+        registerPacket { NostalgiaClientCommandPacket() }
     }
 
     fun readPacket(id: Int, inputStream: DataInputStream): BaseNostalgiaPacket? {

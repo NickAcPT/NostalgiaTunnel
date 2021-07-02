@@ -65,6 +65,7 @@ abstract class NostalgiaClient(private val address: String, private val port: In
 
     fun sendPacket(packet: NostalgiaPacket) {
         writingPool.execute {
+            val aaa = this@NostalgiaClient
             packet.writePacket(outputStream!!)
             onPacketWrite(packet)
             outputStream!!.flush()
