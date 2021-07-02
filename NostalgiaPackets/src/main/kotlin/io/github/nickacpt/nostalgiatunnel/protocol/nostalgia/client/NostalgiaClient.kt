@@ -3,7 +3,7 @@ package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.client
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaProtocol
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.NostalgiaPingPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaPingPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaClientProtocolPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaServerAuthDataPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.login.NostalgiaSharedKeyPacket

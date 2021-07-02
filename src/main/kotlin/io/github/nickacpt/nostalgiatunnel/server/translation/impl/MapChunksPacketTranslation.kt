@@ -5,7 +5,7 @@ import com.github.steveice10.mc.protocol.data.game.chunk.Column
 import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag
 import com.github.steveice10.packetlib.packet.Packet
-import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.NostalgiaMapChunksPacket
+import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.world.NostalgiaMapChunksPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.chunk.NostalgiaChunk
 import io.github.nickacpt.nostalgiatunnel.server.translation.MultiInputPacketTranslation
 import io.github.nickacpt.nostalgiatunnel.server.translation.mapping.ItemStackTranslator

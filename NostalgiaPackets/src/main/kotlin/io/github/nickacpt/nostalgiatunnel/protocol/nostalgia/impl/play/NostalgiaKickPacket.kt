@@ -5,7 +5,7 @@ import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 class NostalgiaKickPacket : NostalgiaPacket(0xFF) {
     var message by value().string(256)
 
-    val messageSplit get() = message.split(0.toChar()).drop(1)
+    private val messageSplit get() = message.split(0.toChar()).drop(1)
 
     val protocolVersion get() = messageSplit[0].toInt()
     val serverVersion get() = messageSplit[1]

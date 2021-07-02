@@ -1,4 +1,4 @@
-package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play
+package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.world
 
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.BaseNostalgiaPacket
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.model.chunk.NostalgiaChunk

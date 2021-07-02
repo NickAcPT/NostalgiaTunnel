@@ -1,4 +1,4 @@
-package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play
+package io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.impl.play.entity
 
 import io.github.nickacpt.nostalgiatunnel.protocol.nostalgia.NostalgiaPacket
 
